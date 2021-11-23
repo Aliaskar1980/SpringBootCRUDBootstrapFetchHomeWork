@@ -1,5 +1,7 @@
 package com.peaksoft.SpringBootCRUD.entity;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -9,23 +11,75 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-
-@Table(name = "users")
+@Table(name = "Users")
 public class User implements UserDetails {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private String name;
-    private String password;
+    private long id;
+
+    @Column(name = "first_name")
+    private String firstName;
+
+    @Column(name = "last_name")
+    private String lastName;
+
+    @Column(name = "age")
     private int age;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "user_role",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    @Column(name = "user_name", nullable = false, unique = true)
+    private String username;
+
+    @Column(name = "password")
+    private String password;
+
+    @Column(name = "email")
+    private String email;
+
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
+    @Fetch(FetchMode.JOIN)
+    @JoinTable(name = "Users_roles",
+            joinColumns = @JoinColumn(name = "users_id"),
+            inverseJoinColumns = @JoinColumn(name = "roles_id"))
     private Set<Role> roles = new HashSet<>();
 
+
     public User() {
+    }
+
+    public User(long id, String firstName, String lastName, int age, String username, String password, String email, Set<Role> roles) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.age = age;
+        this.username = username;
+        this.password = password;
+        this.email = email;
+        this.roles = roles;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String sir_name) {
+        this.firstName = sir_name;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public int getAge() {
@@ -36,32 +90,30 @@ public class User implements UserDetails {
         this.age = age;
     }
 
-    public User(Long id, String name, String password, Set<Role> roles, int age) {
-        this.id = id;
-        this.name = name;
-        this.password = password;
-        this.roles = roles;
-        this.age = age;
+    @Override
+    public String getUsername() {
+        return username;
     }
 
-    public Long getId() {
-        return id;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    @Override
+    public String getPassword() {
+        return password;
     }
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public Set<Role> getRoles() {
@@ -73,29 +125,8 @@ public class User implements UserDetails {
     }
 
     @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", password='" + password + '\'' +
-                ", age=" + age +
-                ", roles=" + roles +
-                '}';
-    }
-
-    @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles;
-    }
-
-    @Override
-    public String getPassword() {
-        return password;
-    }
-
-    @Override
-    public String getUsername() {
-        return name;
+        return getRoles();
     }
 
     @Override

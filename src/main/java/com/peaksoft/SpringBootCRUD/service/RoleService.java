@@ -1,16 +1,19 @@
 package com.peaksoft.SpringBootCRUD.service;
 
+
+
 import com.peaksoft.SpringBootCRUD.entity.Role;
 
 import java.util.List;
 
-public interface    RoleService {
-//  getAllRoles
-    List<Role> findAll();
+public interface RoleService {
+    List<Role> getAllRoles();
 
-    List<String> getNamesOfRolesToList();
+    void add(Role role);
 
-    Role getRoleByName(String role);
+    void edit(Role role);
 
+    Role getById(int id);
 
+    Role getByName(String name);
 }

@@ -1,26 +1,24 @@
 package com.peaksoft.SpringBootCRUD.service;
 
 
+
 import com.peaksoft.SpringBootCRUD.entity.User;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
-
-@Service
 public interface UserService {
+
+    List<User> getAllUsers();
+
     void save(User user);
 
-    List<User> findAll();
+    void update(User user);
 
-    Optional<User> findById(Long id);
+    void delete(User user);
 
-    void deleteById(Long id);
+    User getById(long id);
 
-    void mergeUser(User user);
+    User getUserByUsername(String userName);
 
-    User getUserByName(String name);
-
-
+    User getUserByEmail(String email);
 }

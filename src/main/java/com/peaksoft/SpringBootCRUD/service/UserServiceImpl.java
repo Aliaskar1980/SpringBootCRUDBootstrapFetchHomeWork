@@ -1,53 +1,69 @@
 package com.peaksoft.SpringBootCRUD.service;
 
+
 import com.peaksoft.SpringBootCRUD.entity.User;
 import com.peaksoft.SpringBootCRUD.repository.UserRepository;
+import javassist.NotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
-public class UserServiceImpl implements UserService{
-
-    private  final UserRepository userRepository;
+public class UserServiceImpl implements UserService {
+    private final UserRepository userRepository;
 
     public UserServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
     @Override
-    public void save(User user) {
-        userRepository.save(user);
-
-    }
-
-    @Override
-    public List<User> findAll() {
+    public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
     @Override
-    public Optional<User> findById(Long id) {
-        return userRepository.findById(id);
-    }
-
-    @Override
-    public void deleteById(Long id) {
-        userRepository.deleteById(id);
-
-    }
-
-    @Override
-    public void mergeUser(User user) {
+    public void save(User user) {
         userRepository.save(user);
-
     }
 
     @Override
-    public User getUserByName(String name) {
-        List<User> users = findAll();
+    public void update(User user) {
+        userRepository.save(user);
+    }
 
-        return users.stream().filter(x->x.getUsername().equals(name)).findAny().orElse(new User());
+    @Override
+    public void delete(User user) {
+        userRepository.delete(user);
+    }
+
+    @Override
+    public User getById(long id) {
+        return userRepository.findById(id).get();
+    }
+
+    @Override
+    public User getUserByUsername(String userName) {
+        User user = userRepository.findUserByUsername(userName);
+        if (userName==null){
+            try {
+                throw new NotFoundException(userName);
+            } catch (NotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+        return user;
+    }
+
+    @Override
+    public User getUserByEmail(String email) {
+        User user = userRepository.findUserByEmail(email);
+        if (email==null){
+            try {
+                throw new NotFoundException(email);
+            } catch (NotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+        return user;
     }
 }

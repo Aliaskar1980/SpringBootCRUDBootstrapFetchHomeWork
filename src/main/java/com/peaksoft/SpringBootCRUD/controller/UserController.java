@@ -1,22 +1,22 @@
 package com.peaksoft.SpringBootCRUD.controller;
 
 
-
 import com.peaksoft.SpringBootCRUD.entity.Role;
 import com.peaksoft.SpringBootCRUD.entity.User;
 import com.peaksoft.SpringBootCRUD.service.RoleService;
 import com.peaksoft.SpringBootCRUD.service.UserService;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
+
 
 @Controller
 @RequestMapping("/")
 public class UserController {
-
     private final UserService userService;
     private final RoleService roleService;
 
@@ -25,106 +25,73 @@ public class UserController {
         this.roleService = roleService;
     }
 
-    @GetMapping("/")
-    public String getHomePage() {
-        return "main-page";
-    }
+//    @GetMapping("/")
+//    public String getHomePage() {
+//        return "home-page";
+//    }
 
     @GetMapping("/login")
-    public String getLoginPage() {
+    public String login() {
         return "login";
     }
 
+    @GetMapping("admin")
+    public String listUser(Model model, @AuthenticationPrincipal User user) {
+        model.addAttribute("listUser", userService.getAllUsers());
+        model.addAttribute("listRoles", roleService.getAllRoles());
+        model.addAttribute("user",user);
+        return "adminPage";
+    }
 
-    @GetMapping("/user")
-    public String getUser(Principal principal, Model model) {
-
-        User user = userService.getUserByName(principal.getName());
+    @GetMapping("user")
+    public String infoUser(@AuthenticationPrincipal User user, Model model) {
         model.addAttribute("user", user);
-        return "user";
+        model.addAttribute("roles", user.getRoles());
+        return "userPage";
     }
-
-    @GetMapping("/admin")
-    public String showUserList1(Model model) {
-        List<User> listUsers = userService.findAll();
-        model.addAttribute("listUsers", listUsers);
-        return "users";
-    }
-
-//    @GetMapping("/users")
-//    //localhost:1000/users
-//    public String showUserList(Model model) {
-//        List<User> listUsers = userService.getAllUser();
-//        model.addAttribute("listUsers", listUsers);
-//        return "users";
-//    }
-
-//    @PostMapping("/user")
 //
+//    @GetMapping(value = "admin/new")
+//    public String newUser(Model model) {
+//        model.addAttribute("user", new User());
+//        model.addAttribute("roles", roleService.getAllRoles());
+//        return "createNew";
 //    }
 
-    @GetMapping("/users/new")
-    public String showNewForm(@ModelAttribute("user") User user, Model model) {
-//        model.addAttribute("user", user);
-        model.addAttribute("user", new User());
-        List<Role> roles = roleService.findAll();
-        model.addAttribute("allRoles", roles);
-        System.out.println(model.addAttribute("allRoles", roles));
-        return "user_form";
-    }
-
-    @PostMapping("/users/save")
-    public String createUser(User user, @RequestParam Map<String, String> form) {
-        List<String> roles = roleService.getNamesOfRolesToList();
-
-        Set<String> strings = new HashSet<>(roles);
-        user.getRoles().clear();
-        for (String key : form.keySet()) {
-            if (strings.contains(key)) {
-                user.getRoles().add(roleService.getRoleByName(key));
-                System.out.println(roles + " " + roleService.getRoleByName(key));
-            }
+    @PostMapping(value = "admin/new")
+    public String newUser(@ModelAttribute User user,
+                          @RequestParam(value = "rolez") String[] role) {
+        Set<Role> roleSet = new HashSet<>();
+        for (String roles : role) {
+            roleSet.add(roleService.getByName(roles));
         }
-        userService.mergeUser(user);
+        user.setRoles(roleSet);
+        userService.save(user);
         return "redirect:/admin";
     }
 
-    @GetMapping("/users/edit/{id}")
-    public String showEditForm(@PathVariable("id") Long id, Model model) {
-        Optional<User> user = userService.findById(id);
-        model.addAttribute("user", user);
-
-        List<Role> roles = roleService.findAll();
-        model.addAttribute("allRoles", roles);
-
-        return "user_form";
-    }
-
-    @GetMapping("/users/update/{id}")
-    public String updateUser(User user, @RequestParam Map<String, String> form) {
-        List<String> roles = roleService.getNamesOfRolesToList();
-
-        Set<String> strings = new HashSet<>(roles);
-        user.getRoles().clear();
-        for (String key : form.keySet()) {
-            if (strings.contains(key)) {
-                user.getRoles().add(roleService.getRoleByName(key));
-                System.out.println(roles + " " + roleService.getRoleByName(key));
-            }
-        }
-
-        userService.mergeUser(user);
-        return "redirect:/admin";
-    }
-//    public String updateUser(User user) {
-//        userService.mergeUser(user);
-//        return "redirect:/admin";
+//    @GetMapping(value = "admin/edit/{id}")
+//    public String editUser(@PathVariable("id") long id, Model model) {
+//        model.addAttribute("user", userService.getById(id));
+//        model.addAttribute("roles", roleService.getAllRoles());
+//        return "editUser";
 //    }
 
+    @PostMapping(value = "admin/edit/{id}")
+    public String editUser(@ModelAttribute User user, @RequestParam(value = "rolez") String[] role) {
 
-    @GetMapping("/users/delete/{id}")
-    public String deleteUser(@PathVariable("id") Long id) {
-        userService.deleteById(id);
+        Set<Role> roleSet = new HashSet<>();
+        for (String roles : role) {
+            roleSet.add(roleService.getByName(roles));
+        }
+        user.setRoles(roleSet);
+        userService.update(user);
+        return "redirect:/admin";
+    }
+
+    @PostMapping(value = "admin/delete/{id}")
+    public String deleteUser(@PathVariable("id") long id) {
+        User user = userService.getById(id);
+        userService.delete(user);
         return "redirect:/admin";
     }
 }
