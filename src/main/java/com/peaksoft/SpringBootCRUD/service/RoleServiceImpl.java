@@ -5,6 +5,7 @@ import com.peaksoft.SpringBootCRUD.entity.Role;
 import com.peaksoft.SpringBootCRUD.repository.RoleRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,8 +43,24 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public Role getByName(String name) {
-        Role role = roleRepository.findByNameRole(name);
-        return role;
+    public Role getRoleByName(String name) {
+        List<Role> roles = roleRepository.findAll();
+        List<String> list = new ArrayList<>();
+        for (Role role : roles) {
+            if (role.getNameRole().equals(name)) {
+                return role;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public List<String> getNamesOfRoles() {
+        List<Role> roles = roleRepository.findAll();
+        List<String> list = new ArrayList<>();
+        for (Role role : roles) {
+            list.add(role.getNameRole());
+        }
+        return list;
     }
 }

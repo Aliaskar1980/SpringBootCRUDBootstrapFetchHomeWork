@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
@@ -15,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
+@EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final UserDetailsService userDetailsService;
     private final SuccessUserHandler successUserHandler;
@@ -39,20 +40,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         auth.authenticationProvider(daoAuthenticationProvider());
     }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return NoOpPasswordEncoder.getInstance();
-    }
-
-
-
-    @Override
-    public void configure(WebSecurity web) throws Exception {
-        super.configure(web);
-    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+        http.authorizeRequests()
+                .antMatchers("/", "/login").anonymous()    //permitAll()
+                .antMatchers("/user").access("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
+                .antMatchers("/admin").access("hasRole('ROLE_ADMIN')")
+                .anyRequest().authenticated();
+
         http.formLogin()
                 .loginPage("/login")
                 .successHandler(successUserHandler)
@@ -61,18 +57,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .passwordParameter("j_password")
                 .permitAll();
 
-
-        http.authorizeRequests()
-                .antMatchers("/login").anonymous()//permitAll()
-                .antMatchers("/admin").access("hasRole('ROLE_ADMIN')")
-                .antMatchers("/user").access("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
-                .antMatchers("/").authenticated()
-                .anyRequest().authenticated();
-
         http.logout()
                 .permitAll()
                 .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+//                .logoutSuccessUrl("/")
                 .logoutSuccessUrl("/login?logout")
                 .and().csrf().disable();
+
     }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return NoOpPasswordEncoder.getInstance();
+    }
+
+
 }

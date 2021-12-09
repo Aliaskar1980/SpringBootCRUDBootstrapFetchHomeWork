@@ -1,5 +1,8 @@
 package com.peaksoft.SpringBootCRUD.entity;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
@@ -7,6 +10,8 @@ import java.util.Set;
 
 @Entity
 @Table(name = "roles")
+@NoArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class Role implements GrantedAuthority {
 
     @Id
@@ -14,51 +19,25 @@ public class Role implements GrantedAuthority {
     private int id;
 
     @Column(name = "name_role",nullable = false, unique = true)
-    private String nameRole;
+    String nameRole;
 
-    @ManyToMany(mappedBy = "roles")
-    private Set<User> users;
 
-    public Role() {
+
+    @Override
+    public String toString() {
+        return nameRole;
     }
 
-    public Role(int id, String nameRole, Set<User> users) {
-        this.id = id;
-        this.nameRole = nameRole;
-        this.users = users;
+    @Override
+    public String getAuthority() {
+        return nameRole;
     }
 
     public int getId() {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public String getNameRole() {
-        return nameRole;
-    }
-
-    public void setNameRole(String nameRole) {
-        this.nameRole = nameRole;
-    }
-
-    public Set<User> getUsers() {
-        return users;
-    }
-
-    public void setUsers(Set<User> userSet) {
-        this.users = userSet;
-    }
-
-    @Override
-    public String toString() {
-        return nameRole.split("_")[1];
-    }
-
-    @Override
-    public String getAuthority() {
         return nameRole;
     }
 }
