@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface RoleRepository extends JpaRepository<Role, Integer> {
     Role findByNameRole(String role);
+
+//    Role getRoleByRoleName(String role);
 }

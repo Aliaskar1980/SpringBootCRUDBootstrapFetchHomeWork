@@ -24,7 +24,9 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public void add(Role role) {
-        roleRepository.save(role);
+        if (roleRepository.findByNameRole(role.getNameRole())==null){
+            roleRepository.save(role);
+        }
     }
 
     @Override
@@ -63,4 +65,6 @@ public class RoleServiceImpl implements RoleService {
         }
         return list;
     }
+
+
 }

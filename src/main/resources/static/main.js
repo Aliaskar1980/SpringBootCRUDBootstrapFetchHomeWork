@@ -6,7 +6,6 @@ function register() {
 
         event.preventDefault();
 
-
         let firstname = document.getElementById('firstname').value;
         let lastname = document.getElementById('lastName').value;
         let username = document.getElementById('username').value;
@@ -46,18 +45,16 @@ function register() {
     });
 }
 
-//------------------------------------------------------------
-//Delete user
+//---------------Delete user-------------
 function deleteUser(id) {
-    fetch('http://localhost:7777/delete/' + id, {
+    fetch('http://localhost:7777/api/delete/' + id, {
         method: "DELETE"
     })
     window.location.reload(true);
 }
 
-//---------------------------------------------------------
 
-//Update user
+//-------------Update user--------------------------------
 function updateUser() {
 
     let al = document.getElementById('edit');
@@ -85,13 +82,13 @@ function updateUser() {
         roles.push(role_a);
     }
 
-    fetch('http://localhost:7777/edit', {
+    fetch('http://localhost:7777/api/'+ id, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            id:id,
+            id: id,
             firstName: firstname,
             lastName: lastname,
             email: email,
@@ -108,7 +105,7 @@ function updateUser() {
 //--------------findById------------------
 
 function findById(id) {
-    fetch('http://localhost:7777/find/' + id)
+    fetch('http://localhost:7777/api/find/' + id)
         .then(response => response.json())
         .then(data => {
 
@@ -137,6 +134,7 @@ function findById(id) {
                  <label for="role_admin1">ROLE_ADMIN</label>
                   <br>
                 <button id="noUpdate" onclick="updateUser()" class="btn btn-success">Update</button>
+                  <button type="button" class="btn btn-secondary m-2" onclick="cancelForm()">Cancel</button>
        </form>
           `
             let value = document.getElementById('update');
@@ -145,9 +143,9 @@ function findById(id) {
 }
 
 
-//--------------------------------------------
+//-------GetAllUsers-------------------------------------
 
-let url2 = 'http://localhost:7777/getUsers';
+let url2 = 'http://localhost:7777/api/getUsers';
 fetch(url2)
     .then(response => response.json())
     .then(data => {
@@ -175,10 +173,14 @@ fetch(url2)
                  `;
 
             let value1 = document.getElementById('table-id');
-            let navTitleValue = document.getElementById('navTitle');
+            // let navTitleValue = document.getElementById('navTitle');
             console.log(value1)
             value1.innerHTML += output;
-            // navTitleValue.innerHTML = `${user.roles.toString()}`;
+            // navTitleValue.innerHTML = `${user.nameRole.toString()}`;
         })
     })
 
+function cancelForm() {
+    window.location.reload(true);
+
+}

@@ -1,5 +1,6 @@
 package com.peaksoft.SpringBootCRUD.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -16,11 +17,14 @@ public class Role implements GrantedAuthority {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
-    @Column(name = "name_role",nullable = false, unique = true)
+    @Column(name = "name_role", nullable = false, unique = true)
     String nameRole;
 
+    @JsonIgnore
+    @ManyToMany(mappedBy = "roles")
+    private Set<User> users;
 
 
     @Override
@@ -33,11 +37,13 @@ public class Role implements GrantedAuthority {
         return nameRole;
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
     public String getNameRole() {
         return nameRole;
     }
+
+
 }

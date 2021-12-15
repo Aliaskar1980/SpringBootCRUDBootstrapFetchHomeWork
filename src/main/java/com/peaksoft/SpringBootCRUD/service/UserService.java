@@ -7,9 +7,13 @@ import com.peaksoft.SpringBootCRUD.entity.User;
 import java.util.List;
 
 public interface UserService {
-    List<User> getAllUsers();
+//    User register (User user);//14/12/
     User saveUser(User user);
+    List<User> getAllUsers();
+    User findByUsername(String username);
     User findById(int id);
     void deleteById(int id);
-    User findByUsername(String username);
+//    void updateUser(Long id, User user);
+
+
 }
